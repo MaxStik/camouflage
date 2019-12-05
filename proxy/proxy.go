@@ -91,7 +91,11 @@ func Proxy(redispool *redis.Pool, fluent *fluent.Fluent) {
 
 	//This function "onRequstCommonFunc" is being executed for each http[s] requests.
 	onRequstCommonFunc := func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-		id := gouuid.NewV4()
+		id, err := gouuid.NewV4()
+		if err != nil {
+		        fmt.Printf("Something went wrong: %s", err)
+		        return
+		}
 		uuid := id.Bytes()
 		ctx.UserData = map[string][]byte{"uuid": uuid}
 		GoProxy.Tr = &http.Transport{Dial: forward(Conf.ReverseProxyServer, GoProxy)}
